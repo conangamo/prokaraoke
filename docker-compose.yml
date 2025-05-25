@@ -1,0 +1,37 @@
+
+
+services:
+  web:
+    build: .
+    container_name: karaoke-app
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+      - ./static/images:/app/static/images
+    depends_on:
+      - db
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_DB=karaoke_db
+
+  db:
+    image: mysql:8.0
+    container_name: karaoke-db
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=karaoke_db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  mysql_data: 
