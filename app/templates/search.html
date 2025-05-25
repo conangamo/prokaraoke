@@ -60,15 +60,13 @@
                                 {% endif %}
                             </div>
                             {% if session.get('user_id') %}
-                                {% if song.is_favorite %}
-                                    <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}">
+                                <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}">
+                                    {% if song.is_favorited_by(session.get('user_id')) %}
                                         <i class="fas fa-star favorite-icon"></i>
-                                    </a>
-                                {% else %}
-                                    <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}">
+                                    {% else %}
                                         <i class="far fa-star favorite-icon"></i>
-                                    </a>
-                                {% endif %}
+                                    {% endif %}
+                                </a>
                             {% endif %}
                         </div>
                         

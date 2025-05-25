@@ -3,6 +3,7 @@ from app.models.song import Song
 from app import db
 from app.utils.decorators import login_required
 from app.utils.helpers import save_image
+from app.models.favorite import Favorite
 
 song = Blueprint('song', __name__)
 
@@ -178,17 +179,30 @@ def restore_song(song_id):
 def toggle_favorite(song_id):
     """Thêm/bỏ bài hát vào/khỏi danh sách yêu thích"""
     song_item = Song.query.get_or_404(song_id)
+    user_id = session.get('user_id')
     
-    # Đánh dấu yêu thích hoặc bỏ đánh dấu
-    song_item.is_favorite = not song_item.is_favorite
+    # Tìm kiếm bản ghi yêu thích
+    favorite = Favorite.query.filter_by(user_id=user_id, song_id=song_id).first()
     
     try:
-        db.session.commit()
-        if song_item.is_favorite:
-            flash(f'Đã thêm bài hát "{song_item.title}" vào danh sách yêu thích!', 'success')
+        if favorite:
+            # Nếu đã yêu thích, xóa bỏ
+            db.session.delete(favorite)
+            message = f'Đã xóa bài hát "{song_item.title}" khỏi danh sách yêu thích!'
         else:
-            flash(f'Đã xóa bài hát "{song_item.title}" khỏi danh sách yêu thích!', 'success')
-        return redirect(url_for('song.view_song', song_id=song_id))
+            # Nếu chưa yêu thích, thêm vào
+            favorite = Favorite(user_id=user_id, song_id=song_id)
+            db.session.add(favorite)
+            message = f'Đã thêm bài hát "{song_item.title}" vào danh sách yêu thích!'
+        
+        db.session.commit()
+        flash(message, 'success')
+        
     except Exception as e:
         flash(f'Lỗi khi cập nhật trạng thái yêu thích: {str(e)}', 'danger')
-        return redirect(url_for('song.view_song', song_id=song_id)) 
+    
+    # Xác định trang trả về dựa trên HTTP_REFERER
+    referer = request.headers.get('Referer')
+    if referer:
+        return redirect(referer)
+    return redirect(url_for('song.view_song', song_id=song_id)) 

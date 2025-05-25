@@ -10,7 +10,7 @@
                 <h3 class="mb-0">Chi tiết bài hát</h3>
                 <div>
                     {% if session.get('user_id') %}
-                        {% if song.is_favorite %}
+                        {% if song.is_favorited_by(session.get('user_id')) %}
                             <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}" class="btn btn-sm btn-outline-warning me-2" title="Bỏ yêu thích">
                                 <i class="fas fa-star"></i> Đã yêu thích
                             </a>

@@ -13,17 +13,23 @@ class Song(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('Users.id'), nullable=True)
     is_admin_upload = db.Column(db.Boolean, default=False)
     is_deleted = db.Column(db.Boolean, default=False)
-    is_favorite = db.Column(db.Boolean, default=False)
+    
+    # Định nghĩa mối quan hệ với Favorite
+    favorites = db.relationship('Favorite', backref='song', lazy='dynamic', cascade='all, delete-orphan')
     
     def __init__(self, title, artist, user_id=None, image_path='/static/images/default_image.jpg', 
-                is_admin_upload=False, is_deleted=False, is_favorite=False):
+                is_admin_upload=False, is_deleted=False):
         self.title = title
         self.artist = artist
         self.image_path = image_path
         self.user_id = user_id
         self.is_admin_upload = is_admin_upload
         self.is_deleted = is_deleted
-        self.is_favorite = is_favorite
+    
+    # Kiểm tra xem bài hát có được yêu thích bởi user_id hay không
+    def is_favorited_by(self, user_id):
+        from app.models.favorite import Favorite
+        return Favorite.query.filter_by(user_id=user_id, song_id=self.id).first() is not None
     
     def serialize(self):
         """Chuyển đổi đối tượng thành từ điển để trả về API"""
@@ -34,8 +40,7 @@ class Song(db.Model):
             'image_path': self.image_path,
             'user_id': self.user_id,
             'is_admin_upload': self.is_admin_upload,
-            'is_deleted': self.is_deleted,
-            'is_favorite': self.is_favorite
+            'is_deleted': self.is_deleted
         }
     
     def __repr__(self):

@@ -1,13 +1,6 @@
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Bảng quan hệ nhiều-nhiều giữa User và Song cho tính năng yêu thích
-favorites = db.Table('Favorites',
-    db.Column('user_id', db.Integer, db.ForeignKey('Users.id'), primary_key=True),
-    db.Column('song_id', db.Integer, db.ForeignKey('Songs.id'), primary_key=True),
-    db.Column('created_at', db.DateTime, server_default=db.func.now())
-)
-
 class User(db.Model):
     """Model User đại diện cho người dùng trong hệ thống"""
     __tablename__ = 'Users'
@@ -20,16 +13,25 @@ class User(db.Model):
     # Thiết lập relationship one-to-many với Song
     songs = db.relationship('Song', backref='user', lazy=True)
     
-    # Thiết lập relationship many-to-many với Song cho tính năng yêu thích
-    favorite_songs = db.relationship('Song', 
-                                     secondary=favorites, 
-                                     lazy='subquery',
-                                     backref=db.backref('favorited_by', lazy=True))
+    # Thiết lập relationship one-to-many với Favorite
+    favorites = db.relationship('Favorite', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     
     def __init__(self, username, password, is_admin=False):
         self.username = username
         self.password = generate_password_hash(password)
         self.is_admin = is_admin
+    
+    # Kiểm tra xem người dùng đã yêu thích bài hát nào chưa
+    def has_favorited(self, song_id):
+        from app.models.favorite import Favorite
+        return Favorite.query.filter_by(user_id=self.id, song_id=song_id).first() is not None
+    
+    # Lấy tất cả bài hát yêu thích của người dùng
+    def get_favorite_songs(self):
+        from app.models.song import Song
+        from app.models.favorite import Favorite
+        favorites = Favorite.query.filter_by(user_id=self.id).all()
+        return [Song.query.get(fav.song_id) for fav in favorites]
     
     def check_password(self, password):
         """Kiểm tra mật khẩu"""
@@ -52,4 +54,4 @@ class User(db.Model):
         return str(self.id)
     
     def __repr__(self):
-        return f"<User {self.username}>"
+        return f"<User {self.username}>" 
