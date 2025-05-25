@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Bài hát yêu thích - Ứng dụng Karaoke{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-4">Bài Hát Yêu Thích</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <a href="{{ url_for('main.home') }}" class="btn btn-secondary">Quay lại trang chủ</a>
+    </div>
+</div>
+
+{% if not session.get('is_admin') %}
+<div class="row mb-3">
+    <div class="col">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Chỉ Admin mới có thể xem chi tiết các bài hát được đăng bởi Admin.
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    {% if songs %}
+        {% for song in songs %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                        <span>Bài hát yêu thích</span>
+                        <i class="fas fa-star favorite-icon"></i>
+                    </div>
+                    <img src="{{ song.image_path }}" class="card-img-top" alt="{{ song.title }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ song.title }}</h5>
+                        <p class="card-text">{{ song.artist }}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <a href="{{ url_for('song.view_song', song_id=song.id) }}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                                {% if song.is_admin_upload %}
+                                    <span class="badge bg-danger ms-1">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-info ms-1">User</span>
+                                {% endif %}
+                            </div>
+                            <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}">
+                                <i class="fas fa-star favorite-icon"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">
+                            Đăng bởi: {{ song.user.username if song.user else 'Không xác định' }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center">
+            <div class="alert alert-info">
+                <p class="mb-0">Bạn chưa có bài hát yêu thích nào.</p>
+                <p>Hãy thêm bài hát vào danh sách yêu thích bằng cách nhấn vào biểu tượng <i class="far fa-star"></i> ở trang chi tiết bài hát.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<div class="row mt-3">
+    <div class="col text-center">
+        <a href="{{ url_for('main.home') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại trang chủ
+        </a>
+    </div>
+</div>
+{% endblock %}

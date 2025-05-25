@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ song.title }} - Ứng dụng Karaoke{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h3 class="mb-0">Chi tiết bài hát</h3>
+                <div>
+                    {% if session.get('user_id') %}
+                        {% if song.is_favorite %}
+                            <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}" class="btn btn-sm btn-outline-warning me-2" title="Bỏ yêu thích">
+                                <i class="fas fa-star"></i> Đã yêu thích
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}" class="btn btn-sm btn-outline-warning me-2" title="Yêu thích">
+                                <i class="far fa-star"></i> Yêu thích
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if session.get('user_id') == song.user_id or session.get('is_admin') %}
+                        <a href="{{ url_for('song.edit_song', song_id=song.id) }}" class="btn btn-sm btn-outline-primary me-2">
+                            <i class="fas fa-edit"></i> Chỉnh sửa
+                        </a>
+                        <a href="{{ url_for('song.delete_song', song_id=song.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc muốn xóa bài hát này?')">
+                            <i class="fas fa-trash"></i> Xóa
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row g-0">
+                <div class="col-md-6">
+                    <!-- Kiểm tra đường dẫn ảnh -->
+                    {% if song.image_path and song.image_path != '/static/images/default_image.jpg' %}
+                    <img src="{{ song.image_path }}" class="img-fluid rounded-start" alt="{{ song.title }}" 
+                         style="max-height: 400px; width: 100%; object-fit: cover;" 
+                         onerror="this.onerror=null; this.src='/static/images/default_image.jpg';">
+                    {% else %}
+                    <div class="text-center p-5 bg-light rounded-start" style="height: 400px; display: flex; align-items: center; justify-content: center;">
+                        <div>
+                            <i class="fas fa-image fa-4x text-muted mb-3"></i>
+                            <p class="text-muted">Không có ảnh</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="card-body">
+                        <h2 class="card-title">{{ song.title }}</h2>
+                        <p class="card-text"><strong>Nghệ sĩ:</strong> {{ song.artist }}</p>
+                        
+                        {% if song.user %}
+                            <p class="card-text"><small class="text-muted">Đăng bởi: {{ song.user.username }}</small></p>
+                        {% endif %}
+                        
+                        <p class="card-text">
+                            <small class="text-muted">
+                                {% if song.is_admin_upload %}
+                                    <span class="badge bg-danger">Bài hát Admin</span>
+                                {% else %}
+                                    <span class="badge bg-success">Bài hát User</span>
+                                {% endif %}
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center mb-4">
+            <a href="{{ url_for('main.home') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại trang chủ
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

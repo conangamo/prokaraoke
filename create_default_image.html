@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tạo ảnh mặc định</title>
+</head>
+<body>
+    <h1>Tạo ảnh mặc định</h1>
+    
+    <canvas id="imageCanvas" width="300" height="300" style="border:1px solid #d3d3d3;"></canvas>
+    <br>
+    <button onclick="downloadImage()">Tải xuống ảnh mặc định</button>
+    
+    <script>
+        // Tạo ảnh khi trang được tải
+        window.onload = function() {
+            drawDefaultImage();
+        };
+        
+        function drawDefaultImage() {
+            var canvas = document.getElementById("imageCanvas");
+            var ctx = canvas.getContext("2d");
+            
+            // Xóa canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Vẽ nền
+            ctx.fillStyle = "#f0f0f0";
+            ctx.fillRect(0, 0, 300, 300);
+            
+            // Vẽ viền
+            ctx.strokeStyle = "#d0d0d0";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(1, 1, 298, 298);
+            
+            // Vẽ chữ "No Image"
+            ctx.fillStyle = "#888888";
+            ctx.font = "bold 24px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("Không có ảnh", 150, 150);
+            
+            // Vẽ biểu tượng ảnh
+            ctx.beginPath();
+            ctx.moveTo(125, 100);
+            ctx.lineTo(175, 100);
+            ctx.lineTo(175, 80);
+            ctx.lineTo(125, 80);
+            ctx.closePath();
+            ctx.fillStyle = "#aaaaaa";
+            ctx.fill();
+            
+            // Vẽ hình núi
+            ctx.beginPath();
+            ctx.moveTo(100, 200);
+            ctx.lineTo(130, 170);
+            ctx.lineTo(160, 190);
+            ctx.lineTo(190, 160);
+            ctx.lineTo(220, 210);
+            ctx.lineTo(100, 210);
+            ctx.closePath();
+            ctx.fillStyle = "#aaaaaa";
+            ctx.fill();
+        }
+        
+        function downloadImage() {
+            var canvas = document.getElementById("imageCanvas");
+            
+            // Chuyển đổi canvas thành URL hình ảnh
+            var image = canvas.toDataURL("image/jpg");
+            
+            // Tạo một phần tử a để tải xuống
+            var link = document.createElement('a');
+            link.download = 'default_image.jpg';
+            link.href = image;
+            link.click();
+        }
+    </script>
+</body>
+</html> 

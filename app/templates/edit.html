@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Chỉnh sửa bài hát - Ứng dụng Karaoke{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-4">Chỉnh sửa bài hát</h1>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Thông tin bài hát</h4>
+            </div>
+            <div class="card-body">
+                <form action="/edit/{{ song.id }}" method="POST" enctype="multipart/form-data">
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Tên bài hát <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" value="{{ song.title }}" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="artist" class="form-label">Nghệ sĩ</label>
+                                <input type="text" class="form-control" id="artist" name="artist" value="{{ song.artist }}">
+                                <div class="form-text">Nếu để trống, giá trị mặc định sẽ là "Unknown Artist".</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Ảnh bìa mới (PNG, JPG)</label>
+                                <input type="file" class="form-control" id="image" name="image" accept="image/png, image/jpeg">
+                                <div class="form-text">Để trống nếu không muốn thay đổi ảnh hiện tại.</div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label">Ảnh hiện tại</label>
+                            <div class="card">
+                                <img src="{{ song.image_path }}" class="card-img-top" alt="{{ song.title }}" style="height: 220px; object-fit: cover;">
+                                <div class="card-body">
+                                    <p class="card-text text-center">{{ song.image_path | replace('static/images/', '') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        <a href="/song/{{ song.id }}" class="btn btn-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

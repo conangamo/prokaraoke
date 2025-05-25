@@ -1,29 +1,37 @@
-
-
 services:
   web:
     build: .
-    container_name: karaoke-app
+    container_name: pro-karaoke-app
     restart: always
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - .:/app
-      - ./static/images:/app/static/images
+      - ./app/static/images:/app/static/images
     depends_on:
       - db
     environment:
+      - DOCKER_ENV=true
       - MYSQL_HOST=db
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
       - MYSQL_DB=karaoke_db
+    command: >
+      sh -c "echo 'Đang đợi MySQL khởi động...' &&
+             sleep 15 &&
+             python -u run.py"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   db:
     image: mysql:8.0
-    container_name: karaoke-db
+    container_name: pro-karaoke-db
     restart: always
     ports:
-      - "3307:3306"
+      - "3308:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=root_password
       - MYSQL_DATABASE=karaoke_db

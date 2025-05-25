@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Kết quả tìm kiếm - Ứng dụng Karaoke{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-4">
+    Kết quả tìm kiếm {{ search_type_text }}: "{{ query }}"
+</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6 offset-md-3">
+        <form action="{{ url_for('main.search') }}" method="GET">
+            <div class="input-group mb-3">
+                <input type="text" name="query" class="form-control" placeholder="Nhập từ khóa tìm kiếm..." value="{{ query }}">
+                <select name="search_type" class="form-select">
+                    <option value="title" {% if search_type == 'title' %}selected{% endif %}>Tìm theo tên bài hát</option>
+                    <option value="artist" {% if search_type == 'artist' %}selected{% endif %}>Tìm theo nghệ sĩ</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col text-center">
+        <a href="{{ url_for('main.home') }}" class="btn btn-secondary me-2">Trang chủ</a>
+        {% if session.get('user_id') %}
+        <a href="{{ url_for('song.add_song') }}" class="btn btn-success">Thêm bài hát mới</a>
+        {% endif %}
+    </div>
+</div>
+
+{% if session.get('user_id') and not session.get('is_admin') %}
+<div class="row mb-3">
+    <div class="col">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Chỉ Admin mới có thể xem chi tiết các bài hát được đăng bởi Admin.
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    {% if songs %}
+        {% for song in songs %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{{ song.image_path }}" class="card-img-top" alt="{{ song.title }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ song.title }}</h5>
+                        <p class="card-text">{{ song.artist }}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <a href="{{ url_for('song.view_song', song_id=song.id) }}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                                {% if song.is_admin_upload %}
+                                    <span class="badge bg-danger ms-1">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-info ms-1">User</span>
+                                {% endif %}
+                            </div>
+                            {% if session.get('user_id') %}
+                                {% if song.is_favorite %}
+                                    <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}">
+                                        <i class="fas fa-star favorite-icon"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}">
+                                        <i class="far fa-star favorite-icon"></i>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Nút chỉnh sửa và xóa cho user -->
+                        {% if session.get('user_id') and (session.get('user_id') == song.user_id or session.get('is_admin')) %}
+                        <div class="d-flex justify-content-between mt-2">
+                            <a href="{{ url_for('song.edit_song', song_id=song.id) }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit"></i> Chỉnh sửa
+                            </a>
+                            <a href="{{ url_for('song.delete_song', song_id=song.id) }}" class="btn btn-outline-danger btn-sm" 
+                               onclick="return confirm('Bạn có chắc muốn xóa bài hát này và đưa vào thùng rác?')">
+                                <i class="fas fa-trash"></i> Xóa
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center">
+            <p>Không tìm thấy bài hát nào phù hợp với "{{ query }}".</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

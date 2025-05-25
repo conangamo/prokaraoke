@@ -1,48 +1,73 @@
-# Ứng dụng Tra cứu Thông tin Bài hát Karaoke
+# Ứng Dụng Karaoke
 
-Ứng dụng web đơn giản cho phép tra cứu và thêm bài hát karaoke, được đóng gói bằng Docker để dễ dàng triển khai.
+Ứng dụng tra cứu và quản lý bài hát karaoke với các tính năng:
+- Quản lý bài hát (thêm, sửa, xóa)
+- Hệ thống đăng nhập và phân quyền admin/user
+- Thùng rác để khôi phục bài hát đã xóa
+- Đánh dấu bài hát yêu thích
 
-## Cài đặt và Chạy với Docker
+## Cách chạy ứng dụng
 
-### Yêu cầu
-- [Docker](https://www.docker.com/products/docker-desktop/)
-- [Docker Compose](https://docs.docker.com/compose/install/) (thường đã được cài đặt kèm với Docker Desktop)
+Có hai cách để chạy ứng dụng:
 
-### Các bước cài đặt
+### 1. Sử dụng Docker (Khuyên dùng)
 
-1. **Clone hoặc tải repository này về máy**
+Phương pháp này sẽ tạo môi trường đầy đủ với MySQL Server:
 
-2. **Chạy ứng dụng với Docker Compose**
+```bash
+# Clone repo (nếu chưa có)
+git clone <repository-url>
+cd pro_karaoke_project
 
-   Mở terminal/command prompt và chạy lệnh sau tại thư mục gốc của dự án:
+# Khởi động ứng dụng với Docker
+docker-compose up -d
+```
 
-   ```
-   docker-compose up -d
-   ```
+Truy cập ứng dụng tại: **http://localhost:5001**
 
-   Lệnh này sẽ:
-   - Tạo và chạy container cho ứng dụng Flask
-   - Tạo và chạy container cho MySQL
-   - Thiết lập volumes để lưu trữ dữ liệu
+### 2. Chạy trực tiếp bằng Python
 
-3. **Truy cập ứng dụng**
+Phương pháp này yêu cầu:
+- MySQL Server đang chạy trên port 3308
+- Python 3.x đã được cài đặt
 
-   Mở trình duyệt và truy cập địa chỉ:
-   ```
-   http://localhost:5000
-   ```
+```bash
+# Clone repo (nếu chưa có)
+git clone <repository-url>
+cd pro_karaoke_project
 
-4. **Dừng ứng dụng**
+# Cài đặt thư viện
+pip install -r requirements.txt
 
-   Để dừng ứng dụng, chạy lệnh:
-   ```
-   docker-compose down
-   ```
+# Chạy ứng dụng
+python run.py
+```
 
-   Để dừng và xóa volumes (dữ liệu sẽ bị mất):
-   ```
-   docker-compose down -v
-   ```
+Truy cập ứng dụng tại: **http://localhost:5000**
+
+## Tài khoản mặc định
+
+- **Admin**: 
+  - Username: admin
+  - Password: admin
+
+## Cấu trúc ứng dụng
+
+```
+pro_karaoke_project/
+├── app/                    # Package chính của ứng dụng
+│   ├── models/             # Mô hình dữ liệu
+│   ├── routes/             # Các định tuyến HTTP
+│   ├── static/             # File tĩnh (CSS, JS, hình ảnh)
+│   ├── templates/          # Template HTML
+│   ├── utils/              # Tiện ích
+│   └── __init__.py         # Khởi tạo ứng dụng
+├── config.py               # Cấu hình ứng dụng
+├── docker-compose.yml      # Cấu hình Docker
+├── init.sql                # Script khởi tạo DB
+├── requirements.txt        # Thư viện yêu cầu
+└── run.py                  # Script khởi động
+```
 
 ## Kết nối với MySQL qua MySQL Workbench
 

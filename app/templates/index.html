@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Trang chủ - Ứng dụng Karaoke{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-4">Ứng dụng Tra cứu Karaoke</h1>
+
+<div class="row mb-4">
+    <div class="col-md-6 offset-md-3">
+        <form action="{{ url_for('main.search') }}" method="GET">
+            <div class="input-group mb-3">
+                <input type="text" name="query" class="form-control" placeholder="Nhập từ khóa tìm kiếm...">
+                <select name="search_type" class="form-select">
+                    <option value="title">Tìm theo tên bài hát</option>
+                    <option value="artist">Tìm theo nghệ sĩ</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if session.get('user_id') %}
+<div class="row mb-3">
+    <div class="col text-center">
+        <a href="{{ url_for('song.add_song') }}" class="btn btn-success">Thêm bài hát mới</a>
+    </div>
+</div>
+
+{% if not session.get('is_admin') %}
+<div class="row mb-3">
+    <div class="col">
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> Chỉ Admin mới có thể xem chi tiết các bài hát được đăng bởi Admin.
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endif %}
+
+<div class="row">
+    {% if songs.items %}
+        {% for song in songs.items %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="{{ song.image_path }}" class="card-img-top" alt="{{ song.title }}" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ song.title }}</h5>
+                        <p class="card-text">{{ song.artist }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <a href="{{ url_for('song.view_song', song_id=song.id) }}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                                {% if song.is_admin_upload %}
+                                    <span class="badge bg-danger ms-1">Admin</span>
+                                {% else %}
+                                    <span class="badge bg-info ms-1">User</span>
+                                {% endif %}
+                            </div>
+                            {% if session.get('user_id') %}
+                                {% if song.is_favorite %}
+                                    <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}">
+                                        <i class="fas fa-star favorite-icon"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('song.toggle_favorite', song_id=song.id) }}">
+                                        <i class="far fa-star favorite-icon"></i>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center">
+            <p>Không có bài hát nào. Hãy thêm bài hát mới!</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Phân trang -->
+{% if songs.pages > 1 %}
+<nav aria-label="Page navigation">
+    <ul class="pagination">
+        {% if songs.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('main.home', page=songs.prev_num) }}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&laquo;</span>
+            </li>
+        {% endif %}
+        
+        {% for page_num in songs.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+                {% if page_num == songs.page %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                {% endif %}
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if songs.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('main.home', page=songs.next_num) }}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link">&raquo;</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %} 
