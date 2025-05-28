@@ -69,19 +69,6 @@
                                 </a>
                             {% endif %}
                         </div>
-                        
-                        <!-- Nút chỉnh sửa và xóa cho user -->
-                        {% if session.get('user_id') and (session.get('user_id') == song.user_id or session.get('is_admin')) %}
-                        <div class="d-flex justify-content-between mt-2">
-                            <a href="{{ url_for('song.edit_song', song_id=song.id) }}" class="btn btn-outline-primary btn-sm">
-                                <i class="fas fa-edit"></i> Chỉnh sửa
-                            </a>
-                            <a href="{{ url_for('song.delete_song', song_id=song.id) }}" class="btn btn-outline-danger btn-sm" 
-                               onclick="return confirm('Bạn có chắc muốn xóa bài hát này và đưa vào thùng rác?')">
-                                <i class="fas fa-trash"></i> Xóa
-                            </a>
-                        </div>
-                        {% endif %}
                     </div>
                 </div>
             </div>
